@@ -60,10 +60,6 @@ export default function AppliedJobsPage() {
                       <Briefcase className="h-3 w-3" />
                       {job.type}
                     </Badge>
-                    <Badge variant="secondary" className="flex items-center gap-1">
-                      <DollarSign className="h-3 w-3" />
-                      {job.salary}
-                    </Badge>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Calendar className="h-3 w-3" />
