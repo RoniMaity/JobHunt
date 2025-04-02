@@ -36,5 +36,6 @@ The application features a fully implemented dark mode that:
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   npm install -g pnpm
+   pnpm install
 
