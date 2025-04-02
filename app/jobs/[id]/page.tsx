@@ -1,187 +1,90 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useState } from "react"
+import { use } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Calendar, MapPin, Building, Briefcase, Clock, DollarSign } from "lucide-react"
-import { fetchJobById } from "@/lib/api"
-import { useJobs } from "@/context/jobs-context"
+import { Building, MapPin, Calendar } from "lucide-react"
+import Link from "next/link"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import ApplicationForm from "@/components/application-form"
-import type { Job } from "@/types/job"
 
-export default function JobDetailsPage() {
-  const params = useParams()
-  const router = useRouter()
-  const jobId = params.id as string
-  const [job, setJob] = useState<Job | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [showApplicationForm, setShowApplicationForm] = useState(false)
-  const { appliedJobs } = useJobs()
-
-  const hasApplied = appliedJobs.some((job) => job.id === jobId)
-
-  useEffect(() => {
-    const getJobDetails = async () => {
-      try {
-        const jobData = await fetchJobById(jobId)
-        setJob(jobData)
-      } catch (error) {
-        console.error("Failed to fetch job details:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    getJobDetails()
-  }, [jobId])
-
-  if (loading) {
-    return <JobDetailsSkeleton />
+export default function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const resolvedParams = use(params)
+  
+  // In a real app, we would fetch the job details using the ID
+  const job = {
+    id: resolvedParams.id,
+    title: "Software Engineer",
+    company: "Example Company",
+    location: "San Francisco, CA",
+    type: "Full-time",
+    postedDate: "2024-04-02",
+    description: "We are looking for a talented Software Engineer to join our team...",
+    skills: ["JavaScript", "TypeScript", "React", "Node.js"]
   }
 
-  if (!job) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[50vh]">
-        <h2 className="text-2xl font-bold mb-2">Job not found</h2>
-        <p className="text-muted-foreground mb-4">The job you're looking for doesn't exist or has been removed.</p>
-        <Button onClick={() => router.push("/")}>Back to Jobs</Button>
+  return (
+    <main className="max-w-4xl mx-auto py-8 space-y-8">
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 text-foreground">{job.title}</h1>
+          <div className="flex items-center gap-4 text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Building className="h-4 w-4" />
+              <span>{job.company}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>{job.location}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>Posted 2 days ago</span>
+            </div>
+          </div>
+        </div>
+        <Badge>{job.type}</Badge>
       </div>
-    )
-  }
 
-  return (
-    <div className="space-y-6">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-        ← Back to listings
-      </Button>
+      <div className="prose dark:prose-invert max-w-none">
+        <h2 className="text-foreground">About the Role</h2>
+        <p className="text-muted-foreground">
+          We are looking for a talented Software Engineer to join our team...
+        </p>
 
-      <Card className="border-l-4 border-l-primary transition-colors">
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div>
-              <CardTitle className="text-2xl font-bold">{job.title}</CardTitle>
-              <div className="flex items-center gap-2 mt-2">
-                <Building className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{job.company}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{job.location}</span>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Briefcase className="h-3 w-3" />
-                  {job.type}
-                </Badge>
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Clock className="h-3 w-3" />
-                  {job.experience}
-                </Badge>
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <DollarSign className="h-3 w-3" />
-                  {job.salary}
-                </Badge>
-              </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
-                <Calendar className="h-3 w-3" />
-                <span>Posted {job.postedDate}</span>
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Job Description</h3>
-            <p className="text-muted-foreground whitespace-pre-line">{job.description}</p>
-          </div>
+        <h2 className="text-foreground">Requirements</h2>
+        <ul className="text-muted-foreground">
+          <li>5+ years of experience in software development</li>
+          <li>Strong proficiency in JavaScript/TypeScript</li>
+          <li>Experience with React and modern frontend frameworks</li>
+          <li>Bachelor's degree in Computer Science or related field</li>
+        </ul>
 
-          <div>
-            <h3 className="font-semibold text-lg mb-2">Requirements</h3>
-            <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-              {job.requirements.map((req, index) => (
-                <li key={index}>{req}</li>
-              ))}
-            </ul>
-          </div>
+        <h2 className="text-foreground">Benefits</h2>
+        <ul className="text-muted-foreground">
+          <li>Competitive salary and equity</li>
+          <li>Health, dental, and vision insurance</li>
+          <li>Flexible work hours and location</li>
+          <li>Professional development budget</li>
+        </ul>
+      </div>
 
-          {job.benefits && (
-            <div>
-              <h3 className="font-semibold text-lg mb-2">Benefits</h3>
-              <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                {job.benefits.map((benefit, index) => (
-                  <li key={index}>{benefit}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </CardContent>
-        <CardFooter>
-          {hasApplied ? (
-            <Button disabled className="w-full sm:w-auto">
-              Application Submitted
-            </Button>
-          ) : (
-            <Button onClick={() => setShowApplicationForm(true)} className="w-full sm:w-auto">
-              Apply Now
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
-
-      {showApplicationForm && <ApplicationForm job={job} onClose={() => setShowApplicationForm(false)} />}
-    </div>
+      <div className="flex gap-4">
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="lg">Apply Now</Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogTitle className="text-foreground">Apply for {job.title} at {job.company}</DialogTitle>
+            <ApplicationForm job={job} onClose={() => setIsDialogOpen(false)} />
+          </DialogContent>
+        </Dialog>
+        <Link href="/">
+          <Button variant="outline" size="lg">Back to Jobs</Button>
+        </Link>
+      </div>
+    </main>
   )
-}
-
-function JobDetailsSkeleton() {
-  return (
-    <div className="space-y-6">
-      <Button variant="ghost" disabled className="mb-4">
-        ← Back to listings
-      </Button>
-
-      <Card>
-        <CardHeader>
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="space-y-2">
-              <Skeleton className="h-8 w-64" />
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-4 w-40" />
-            </div>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <Skeleton className="h-6 w-24" />
-                <Skeleton className="h-6 w-24" />
-              </div>
-              <Skeleton className="h-4 w-32" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-40" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Skeleton className="h-10 w-32" />
-        </CardFooter>
-      </Card>
-    </div>
-  )
-}
-
+} 

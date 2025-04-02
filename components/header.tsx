@@ -29,26 +29,30 @@ export default function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
-          {navItems.map((item) => (
-            <Link key={item.path} href={item.path}>
-              <Button
-                variant={pathname === item.path ? "secondary" : "ghost"}
-                className="relative px-4 py-2 transition hover:bg-muted"
-              >
-                {item.name}
-                {item.badge && (
-                  <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground font-semibold">
-                    {item.badge}
-                  </span>
-                )}
-              </Button>
-            </Link>
-          ))}
-        </nav>
+        <div className="hidden md:flex items-center gap-4">
+          <nav className="flex items-center gap-4 text-sm font-medium">
+            {navItems.map((item) => (
+              <Link key={item.path} href={item.path}>
+                <Button
+                  variant={pathname === item.path ? "secondary" : "ghost"}
+                  className="relative px-4 py-2 transition hover:bg-muted"
+                >
+                  {item.name}
+                  {item.badge && (
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground font-semibold">
+                      {item.badge}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            ))}
+          </nav>
+          <ModeToggle />
+        </div>
 
         {/* Mobile Navigation */}
         <div className="md:hidden flex items-center gap-2">
+          <ModeToggle />
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Menu">
@@ -89,9 +93,6 @@ export default function Header() {
               </div>
             </SheetContent>
           </Sheet>
-
-          {/* Theme Toggle */}
-          <ModeToggle />
         </div>
       </div>
     </header>
